@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCAS Hub — รวมข้อมูลรับสมัคร วิศวกรรมคอมพิวเตอร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1f3864; --blue:#2e74b5; --sky:#e8f1fb; --sky2:#f4f9ff;
+    --line:#dbe6f2; --ink:#20303f; --muted:#6b7c8c; --red:#c0392b;
+    --green:#1e8e5a; --amber:#c98a00; --card:#ffffff; --bg:#eef2f7;
+    --nav-w:250px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Sarabun","TH Sarabun New","Segoe UI",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.55}
+
+  /* top bar */
+  .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;
+    background:#fff;border-bottom:1px solid var(--line);padding:12px 18px}
+  .top .brand{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--navy);font-size:18px}
+  .top .brand .mk{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--navy),var(--blue));
+    color:#fff;display:grid;place-items:center;font-size:15px}
+  .top .url{color:var(--muted);font-size:13px}
+  .top .search{margin-left:auto;display:flex;align-items:center;gap:7px;background:var(--sky2);
+    border:1px solid var(--line);border-radius:20px;padding:7px 14px;min-width:190px}
+  .top .search input{border:none;background:none;outline:none;font:inherit;font-size:14px;width:100%;color:var(--ink)}
+  .burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:16px}
+
+  .layout{display:grid;grid-template-columns:var(--nav-w) 1fr;min-height:calc(100vh - 55px)}
+
+  /* sidebar */
+  nav.side{background:#fff;border-right:1px solid var(--line);padding:14px 12px;overflow-y:auto}
+  nav .lbl{font-size:12px;color:var(--muted);margin:4px 8px 8px;text-transform:uppercase;letter-spacing:.5px}
+  .uni{margin-bottom:4px}
+  .uni>.head{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;
+    font-weight:600;font-size:14.5px;transition:.12s;user-select:none}
+  .uni>.head:hover{background:var(--sky2)}
+  .uni>.head .badge{width:26px;height:26px;border-radius:7px;color:#fff;display:grid;place-items:center;
+    font-size:10px;font-weight:700;flex:none}
+  .uni>.head .chev{margin-left:auto;color:var(--muted);transition:.2s;font-size:12px}
+  .uni.open>.head .chev{transform:rotate(90deg)}
+  .progs{max-height:0;overflow:hidden;transition:max-height .25s ease}
+  .uni.open .progs{max-height:300px}
+  .prog{display:flex;align-items:center;gap:8px;padding:8px 10px 8px 30px;border-radius:8px;cursor:pointer;
+    font-size:13.5px;color:var(--muted);transition:.12s}
+  .prog:hover{background:var(--sky2);color:var(--ink)}
+  .prog.active{background:var(--sky);color:var(--blue);font-weight:600}
+  .prog .soon{margin-left:auto;background:#f0f2f5;color:#98a4b0;font-size:10.5px;padding:1px 7px;border-radius:20px}
+  .prog .ok{margin-left:auto;color:var(--green);font-size:14px}
+
+  /* main */
+  main{padding:22px 26px;overflow-y:auto}
+  .wrap{max-width:1000px;margin:0 auto}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+    box-shadow:0 3px 12px rgba(31,56,100,.05);margin-bottom:16px}
+  .card h2{font-size:16.5px;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:9px}
+  .card h2 .ic{width:28px;height:28px;border-radius:8px;background:var(--sky);color:var(--blue);
+    display:grid;place-items:center;font-size:15px;flex:none}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+
+  /* header block */
+  .phead{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-radius:16px;
+    padding:22px 24px;margin-bottom:16px;position:relative;overflow:hidden}
+  .phead::after{content:"</>";position:absolute;right:20px;top:6px;font-size:80px;font-weight:800;opacity:.10;font-family:monospace}
+  .phead h1{font-size:23px;font-weight:800;margin-bottom:3px}
+  .phead .sub{opacity:.9;font-size:14px}
+  .pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+  .pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);padding:5px 13px;
+    border-radius:20px;font-size:13px;font-weight:600}
+  .pill.hot{background:#ffe08a;color:#5a3d00;border-color:#ffe08a}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .stat b{display:block;font-size:20px;color:var(--navy);font-weight:800}
+  .stat span{font-size:12.5px;color:var(--muted)}
+
+  .gate li{list-style:none;display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-weight:600}
+  .gate li:last-child{border-bottom:none}
+  .gate .req{margin-left:auto;background:#eaf4ee;color:var(--green);font-weight:800;padding:3px 11px;border-radius:20px;font-size:13px;white-space:nowrap}
+  .chk{width:22px;height:22px;border-radius:6px;border:2px solid var(--blue);cursor:pointer;flex:none;
+    display:grid;place-items:center;color:#fff;font-size:13px;transition:.15s}
+  .chk.on{background:var(--green);border-color:var(--green)}
+  .note{font-size:13px;color:var(--red);background:#fdecea;border-left:4px solid var(--red);padding:9px 12px;border-radius:8px;margin-top:12px;font-weight:600}
+  .note.g{color:var(--green);background:#eaf4ee;border-color:var(--green)}
+
+  .bar{margin-bottom:13px}
+  .bar .t{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px;font-weight:600}
+  .bar .track{height:14px;background:var(--sky);border-radius:10px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--navy))}
+  .bar small{color:var(--muted);font-weight:500}
+
+  .tl{position:relative;padding-left:26px}
+  .tl::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl .ev{position:relative;padding:9px 0}
+  .tl .ev::before{content:"";position:absolute;left:-22px;top:14px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--blue)}
+  .tl .ev.key::before{background:var(--red);border-color:var(--red)}
+  .tl .d{font-size:13px;color:var(--blue);font-weight:700}
+  .tl .ev.key .d{color:var(--red)}
+  .tl .tx{font-size:14px}
+
+  .docs li{list-style:none;display:flex;gap:11px;padding:10px 0;border-bottom:1px dashed var(--line)}
+  .docs li:last-child{border-bottom:none}
+  .docs .tx b{display:block;font-size:14px}
+  .docs .tx small{color:var(--muted);font-size:12.5px}
+  .progress{margin-top:14px}
+  .progress .track{height:10px;background:var(--sky);border-radius:8px;overflow:hidden}
+  .progress .fill{height:100%;background:linear-gradient(90deg,var(--green),#3cb37a);width:0;transition:.3s}
+  .progress .lbl{font-size:13px;color:var(--muted);margin-top:6px;text-align:right;font-weight:600}
+
+  .pf{display:flex;flex-direction:column;gap:9px}
+  .pf .row{display:flex;gap:12px;align-items:flex-start;padding:11px 13px;border-radius:11px;background:var(--sky2);border:1px solid var(--line)}
+  .pf .row.star{background:#fff7e0;border-color:#ffe08a}
+  .pf .pg{flex:none;background:var(--navy);color:#fff;font-weight:800;font-size:12.5px;padding:4px 9px;border-radius:7px;min-width:56px;text-align:center}
+  .pf .row.star .pg{background:var(--amber)}
+  .pf .tt b{font-size:14px;color:var(--navy)}
+  .pf .tt span{font-size:13px;color:var(--muted);display:block}
+  .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--amber);background:#fff2cc;padding:1px 8px;border-radius:20px;margin-left:6px}
+
+  .tips li{margin:0 0 8px 18px;font-size:14px}
+  .money{display:flex;gap:10px;flex-wrap:wrap}
+  .money .m{flex:1;min-width:140px;background:var(--sky2);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+  .money .m b{color:var(--navy);font-size:18px;display:block}
+  .money .m span{font-size:12px;color:var(--muted)}
+
+  /* coming soon */
+  .soon-wrap{display:grid;place-items:center;min-height:60vh;text-align:center;padding:30px}
+  .soon-wrap .big{width:80px;height:80px;border-radius:20px;display:grid;place-items:center;font-size:34px;color:#fff;margin:0 auto 18px}
+  .soon-wrap h1{font-size:24px;color:var(--navy);margin-bottom:8px}
+  .soon-wrap p{color:var(--muted);max-width:420px;margin:0 auto 6px}
+  .soon-wrap .chip{display:inline-block;background:var(--sky);color:var(--blue);font-weight:600;font-size:13px;padding:6px 16px;border-radius:20px;margin-top:14px}
+
+  footer{color:var(--muted);font-size:12.5px;text-align:center;padding:8px 0 20px;margin-top:4px}
+  a{color:var(--blue)}
+
+  .overlay{display:none}
+  @media(max-width:720px){
+    .layout{grid-template-columns:1fr}
+    nav.side{position:fixed;top:55px;left:0;bottom:0;width:var(--nav-w);z-index:30;transform:translateX(-100%);transition:.25s}
+    nav.side.show{transform:translateX(0)}
+    .burger{display:block}
+    .top .url{display:none}
+    .overlay.show{display:block;position:fixed;inset:55px 0 0 0;background:rgba(0,0,0,.3);z-index:25}
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <button class="burger" onclick="toggleNav()" aria-label="เมนู">☰</button>
+    <div class="brand"><span class="mk">🎓</span> TCAS Hub</div>
+    <span class="url">rednorze.github.io/tcas-hub</span>
+    <div class="search"><span>🔍</span><input id="q" placeholder="ค้นหามหาวิทยาลัย" oninput="filterNav(this.value)"></div>
+  </div>
+
+  <div class="layout">
+    <div class="overlay" id="ov" onclick="toggleNav()"></div>
+    <nav class="side" id="side">
+      <div class="lbl">มหาวิทยาลัย</div>
+      <div id="navList"></div>
+    </nav>
+    <main>
+      <div class="wrap" id="content"></div>
+      <footer>
+        ข้อมูลอ้างอิงจากประกาศทางการของแต่ละสถาบัน — โปรดตรวจสอบล่าสุดที่เว็บของคณะก่อนสมัคร ·
+        อัปเดตรอบ 1 Portfolio ปีการศึกษา 2570
+      </footer>
+    </main>
+  </div>
+
+<script src="data/data.js"></script>
+<script>
+  var DATA = window.TCAS_DATA || [];
+  var current = "mahidol-cpe";
+
+  function esc(s){return (s+"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+  function findProg(pid){
+    for(var i=0;i<DATA.length;i++){
+      var u=DATA[i];
+      for(var j=0;j<u.programs.length;j++){ if(u.programs[j].id===pid) return {uni:u,prog:u.programs[j]}; }
+    }
+    return null;
+  }
+
+  function buildNav(filter){
+    filter=(filter||"").toLowerCase();
+    var html="";
+    DATA.forEach(function(u){
+      if(filter && u.university.toLowerCase().indexOf(filter)<0) return;
+      var open = u.programs.some(function(p){return p.id===current;}) || filter;
+      html+='<div class="uni'+(open?' open':'')+'" data-uni="'+u.id+'">';
+      html+='<div class="head" onclick="toggleUni(this)">';
+      html+='<span class="badge" style="background:'+u.color+'">'+esc(u.logo)+'</span>'+esc(u.university);
+      html+='<span class="chev">▶</span></div>';
+      html+='<div class="progs">';
+      u.programs.forEach(function(p){
+        var active = p.id===current ? ' active':'';
+        var tail = p.status==="ready" ? '<span class="ok">✓</span>' : '<span class="soon">เร็วๆ นี้</span>';
+        html+='<div class="prog'+active+'" onclick="select(\''+p.id+'\')">'+esc(p.name)+tail+'</div>';
+      });
+      html+='</div></div>';
+    });
+    document.getElementById("navList").innerHTML = html || '<p style="color:var(--muted);font-size:13px;padding:10px">ไม่พบผลลัพธ์</p>';
+  }
+
+  function toggleUni(el){ el.parentElement.classList.toggle("open"); }
+  function filterNav(v){ buildNav(v); }
+
+  function select(pid){
+    current=pid; buildNav(document.getElementById("q").value);
+    render(); if(window.innerWidth<=720) toggleNav(true);
+    document.querySelector("main").scrollTop=0;
+  }
+
+  function render(){
+    var f=findProg(current); if(!f){document.getElementById("content").innerHTML="";return;}
+    var p=f.prog, u=f.uni;
+    if(p.status!=="ready"){ renderSoon(u,p); return; }
+    var h="";
+    // header
+    h+='<div class="phead"><h1>'+esc(p.name)+' · '+esc(u.university)+'</h1>';
+    h+='<div class="sub">'+esc(p.faculty)+' · TCAS '+esc(p.round)+' ปีการศึกษา 2570</div>';
+    h+='<div class="pills"><span class="pill hot">🔥 รับ '+p.seats+' คน</span>';
+    h+='<span class="pill">'+esc(p.round)+'</span><span class="pill">'+esc(p.tuition)+'</span></div></div>';
+    // stats
+    h+='<div class="stats">';
+    p.stats.forEach(function(s){h+='<div class="stat"><b>'+esc(s.value)+'</b><span>'+esc(s.label)+'</span></div>';});
+    h+='</div>';
+    // gate + scoring
+    h+='<div class="grid2">';
+    h+='<div class="card"><h2><span class="ic">✓</span> คุณสมบัติขั้นต่ำ (ต้องผ่านทุกข้อ)</h2><ul class="gate">';
+    h+=gateLi("แผนวิทย์-คณิต หรือที่เกี่ยวข้อง","บังคับ");
+    h+=gateLi("GPAX","≥ "+p.gpax_min.toFixed(2));
+    p.gpa.forEach(function(g){h+=gateLi("GPA "+g.subject,"≥ "+g.min.toFixed(2));});
+    h+='</ul><div class="note">⚠ เกรดไม่ถึงเกณฑ์ = ระบบจะไม่แสดงชื่อหลักสูตรให้เลือกสมัคร (ใช้ 4 เทอมถ้ากำลังเรียน ม.6 / 6 เทอมถ้าจบแล้ว)</div></div>';
+    h+='<div class="card"><h2><span class="ic">📊</span> เกณฑ์การคัดเลือก (100%)</h2>';
+    p.weights.forEach(function(w){
+      h+='<div class="bar"><div class="t"><span>'+esc(w.label)+'</span><span>'+w.pct+'%</span></div>';
+      h+='<div class="track"><div class="fill" style="width:'+w.pct+'%"></div></div><small>'+esc(w.note)+'</small></div>';
+    });
+    h+='<div class="note g">➕ '+esc(p.bonus)+'</div></div>';
+    h+='</div>';
+    // timeline + docs
+    h+='<div class="grid2">';
+    h+='<div class="card"><h2><span class="ic">📅</span> ไทม์ไลน์ ('+esc(p.round)+')</h2><div class="tl">';
+    p.timeline.forEach(function(e){h+='<div class="ev'+(e.key?' key':'')+'"><div class="d">'+esc(e.date)+'</div><div class="tx">'+esc(e.event)+'</div></div>';});
+    h+='</div><div class="note">'+esc(p.note)+'</div></div>';
+    h+='<div class="card"><h2><span class="ic">📎</span> เช็กลิสต์เอกสาร <span id="dc" style="font-size:13px;color:var(--muted);font-weight:600"></span></h2><ul class="docs" id="docs">';
+    p.documents.forEach(function(d){h+='<li><span class="chk" onclick="tog(this)"></span><div class="tx"><b>'+esc(d.title)+'</b><small>'+esc(d.detail)+'</small></div></li>';});
+    h+='</ul><div class="progress"><div class="track"><div class="fill" id="pf"></div></div><div class="lbl" id="pl"></div></div></div>';
+    h+='</div>';
+    // portfolio
+    h+='<div class="card"><h2><span class="ic">📁</span> โครง Portfolio 10 หน้า <small style="font-size:12.5px;color:var(--muted);font-weight:500">— เรียงตามน้ำหนักที่คณะให้ความสำคัญ</small></h2><div class="pf">';
+    p.portfolio.forEach(function(r){
+      h+='<div class="row'+(r.star?' star':'')+'"><span class="pg">'+esc(r.page)+'</span><div class="tt"><b>'+esc(r.title)+(r.star?'<span class="tag">'+esc(r.starText)+'</span>':'')+'</b><span>'+esc(r.desc)+'</span></div></div>';
+    });
+    h+='</div></div>';
+    // tips + fees
+    h+='<div class="grid2">';
+    h+='<div class="card"><h2><span class="ic">💡</span> เคล็ดลับ Portfolio</h2><ul class="tips">';
+    p.tips.forEach(function(t){h+='<li>'+esc(t)+'</li>';});
+    h+='</ul></div>';
+    h+='<div class="card"><h2><span class="ic">💰</span> ค่าใช้จ่าย</h2><div class="money">';
+    p.fees.forEach(function(fe){h+='<div class="m"><b>'+esc(fe.amount)+'</b><span>'+esc(fe.label)+'</span></div>';});
+    h+='</div><p style="font-size:13px;color:var(--muted);margin-top:12px">ติดต่อ: '+esc(p.contact)+'<br><a href="'+esc(p.link)+'" target="_blank">'+esc(p.link)+'</a></p></div>';
+    h+='</div>';
+    document.getElementById("content").innerHTML=h;
+    updateDocs();
+  }
+
+  function renderSoon(u,p){
+    var h='<div class="soon-wrap"><div class="big" style="background:'+u.color+'">🚧</div>';
+    h+='<h1>'+esc(p.name)+' · '+esc(u.university)+'</h1>';
+    h+='<p>กำลังรวบรวมข้อมูลเกณฑ์รับสมัครรอบ 1 Portfolio ของ '+esc(u.university)+'</p>';
+    h+='<p>โครงหน้านี้พร้อมแล้ว รอเติมข้อมูลจริงจากประกาศทางการ</p>';
+    h+='<span class="chip">เร็วๆ นี้</span></div>';
+    document.getElementById("content").innerHTML=h;
+  }
+
+  function gateLi(label,req){
+    return '<li><span class="chk" onclick="tog(this)"></span> '+esc(label)+' <span class="req">'+esc(req)+'</span></li>';
+  }
+
+  function tog(el){ el.classList.toggle("on"); el.innerHTML=el.classList.contains("on")?"✓":""; updateDocs(); }
+
+  function updateDocs(){
+    var box=document.querySelectorAll("#docs .chk"); if(!box.length) return;
+    var done=document.querySelectorAll("#docs .chk.on").length;
+    var pct=Math.round(done/box.length*100);
+    var pf=document.getElementById("pf"), pl=document.getElementById("pl"), dc=document.getElementById("dc");
+    if(pf) pf.style.width=pct+"%";
+    if(pl) pl.textContent=done+" / "+box.length+" เตรียมแล้ว";
+    if(dc) dc.textContent="("+done+"/"+box.length+")";
+  }
+
+  function toggleNav(force){
+    var s=document.getElementById("side"), o=document.getElementById("ov");
+    if(force===true){s.classList.remove("show");o.classList.remove("show");return;}
+    s.classList.toggle("show");o.classList.toggle("show");
+  }
+
+  buildNav(); render();
+</script>
+</body>
+</html>
